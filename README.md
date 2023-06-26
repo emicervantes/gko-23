@@ -1,2 +1,3 @@
-# gko-23
-Greedy Kaczmarz Method with Oblique Projection 
+# Greedy Kaczmarz Method with Oblique Projection 
+
+Project descriptions here...
