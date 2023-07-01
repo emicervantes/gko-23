@@ -6,7 +6,7 @@ def gk(A, x, y, TOL):
   x_old = np.zeros(n)
   x_lst = [x_old]
   ap_error = []
-  ar = approximation_error(x_old, x)
+  ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   while True:
     r = (A@x_old - y)**2
