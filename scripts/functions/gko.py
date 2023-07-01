@@ -1,4 +1,5 @@
 
+import numpy as np
 
 def gko(A, x, y, TOL):
   k=1
@@ -6,7 +7,7 @@ def gko(A, x, y, TOL):
   x_old = np.zeros(n)
   x_lst = [x_old]
   ap_error = []
-  ar = approximation_error(x_old, x)
+  ar =  (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   row_lst = []
   [ik, i_k1] = np.random.choice(range(m), 2)
@@ -41,7 +42,7 @@ def gko(A, x, y, TOL):
     xk = x_old + alpha*w
     x_old = xk
     x_lst.append(x_old)
-    ar = approximation_error(x_old, x)
+    ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
 

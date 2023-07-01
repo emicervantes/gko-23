@@ -1,12 +1,13 @@
+import numpy as np
 
-def mwrko(A, x, y, TOL = 0.01):
+def mwrko(A, x, y, TOL):
   k=1
   m, n = A.shape
   x_old = np.zeros(n)
   x_lst = [x_old]
   ap_error = []
   t_lst = []
-  ar = approximation_error(x_old, x)
+  ar =  (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   row_lst = []
   for i in range(m):
@@ -43,7 +44,7 @@ def mwrko(A, x, y, TOL = 0.01):
     xk = x_old + alpha*w
     x_old = xk
     x_lst.append(x_old)
-    ar = approximation_error(x_old, x)
+    ar =  (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
 

@@ -1,3 +1,4 @@
+import numpy as np
 
 def gk(A, x, y, TOL):
   k=1
@@ -8,19 +9,16 @@ def gk(A, x, y, TOL):
   ar = approximation_error(x_old, x)
   ap_error.append(ar)
   while True:
-    r = []
-    for i in range(m):
-      resid = (np.transpose(A[i,:])@x_old - y[i])**2
-      r.append(resid)
+    r = (A@x_old - y)**2
     i = np.argmax(r)
     ai = A[i,:]
-    x_new = x_old - ((np.transpose(ai)@x_old - y[i]) * ai)
+    x_new = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
+    break
     x_lst.append(x_new)
     x_old = x_new
-    ar = approximation_error(x_old, x)
+    ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
     if ar < TOL:
       break
-
   return k, ap_error
