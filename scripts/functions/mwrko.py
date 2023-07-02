@@ -3,39 +3,36 @@ import numpy as np
 def mwrko(A, x, y, TOL):
   k=1
   m, n = A.shape
+  inner_p = A@np.transpose(A)
   x_old = np.zeros(n)
   x_lst = [x_old]
   ap_error = []
-  t_lst = []
-  ar =  (np.linalg.norm(x_old-x))**2
+  ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   row_lst = []
-  for i in range(m):
-      r = abs(y[i] - A[i,:]@x_lst[-1])
-      w = np.linalg.norm(A[i,:])
-      t = r / w
-      t_lst.append([i,t])
-  [ik, t_lst] = max(t_lst,key = lambda x : x[1])
-  row_lst.append(ik)
-  a1 = A[ik,:]
-  x1 = x_old + ((y[ik] - a1@x_old) / np.linalg.norm(a1)**2) * np.transpose(a1)
-  x_lst.append(x1)
+  # pick the row based on maximal weighted residual selection rule
+  resid = abs(A@x_old - y)
+  denom = np.sum(np.abs(A)**2,axis=-1)**(1./2)
+  i1 = np.argmax(resid/denom)
+  # compute the next row
+  a1 = A[i1,:]
+  x1 = x_old - ((a1@x_old - y[i1]) / np.linalg.norm(a1)**2) * np.transpose(a1)
   x_old = x1
+  row_lst.append(i1)
+  x_lst.append(x_old)
+  ar = (np.linalg.norm(x_old-x))**2
+  ap_error.append(ar)
+  k += 1
 
   while True:
     t_lst = []
     ik = row_lst[-1]
-    for i in range(m):
-      if i != ik:
-        r = abs(y[i] - A[i,:]@x_lst[-1])
-        w = np.linalg.norm(A[i,:])
-        t = r / w
-        t_lst.append([i,t])
-
-    [i_k1,t_lst] = max(t_lst,key = lambda x : x[1])
+    resid = abs(A@x_old - y)
+    i_k1 = np.argmax(resid/denom)
     row_lst.append(i_k1)
-    ai = A[ik,:] 
-    ai_k = A[i_k1,:] 
+    # Oblique projection with the new selected row
+    ai = A[ik,:] # a_k-1
+    ai_k = A[i_k1,:] # a_k
     D_ik = ai@ai_k
     r = y[i_k1] - ai_k@x_old
     w = ai_k - ((D_ik / np.linalg.norm(ai)**2) * ai)
@@ -44,7 +41,7 @@ def mwrko(A, x, y, TOL):
     xk = x_old + alpha*w
     x_old = xk
     x_lst.append(x_old)
-    ar =  (np.linalg.norm(x_old-x))**2
+    ar = approximation_error(x_old, x)
     ap_error.append(ar)
     k+=1
 
