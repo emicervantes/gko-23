@@ -13,7 +13,6 @@ def gk(A, x, y, TOL):
     i = np.argmax(r)
     ai = A[i,:]
     x_new = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
-    break
     x_lst.append(x_new)
     x_old = x_new
     ar = (np.linalg.norm(x_old-x))**2

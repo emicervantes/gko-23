@@ -41,7 +41,7 @@ def mwrko(A, x, y, TOL):
     xk = x_old + alpha*w
     x_old = xk
     x_lst.append(x_old)
-    ar = approximation_error(x_old, x)
+    ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
 
