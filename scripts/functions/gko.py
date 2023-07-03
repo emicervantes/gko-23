@@ -1,4 +1,3 @@
-
 import numpy as np
 
 def gko(A, x, y, TOL):
@@ -53,4 +52,5 @@ def gko(A, x, y, TOL):
 
     if ar < TOL:
       break
+    
   return k, ap_error
