@@ -23,6 +23,7 @@ def gko(A, x, y, TOL):
   ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   k += 1
+  t_lst = []
 
   while True:
     ik = row_lst[-1]
@@ -31,7 +32,9 @@ def gko(A, x, y, TOL):
     all_comb = np.delete(inner_p[:,ik], ik)
     denom = inner_dig - np.square(all_comb) / np.linalg.norm(A[ik,:])**2
     resid  = np.delete(abs(A@x_old - y), ik)
-    i_k1 = np.argmax(resid/denom)
+    i_k1 = np.argmax(resid/np.sqrt(denom))
+    t = resid/np.sqrt(denom)
+    t_lst.append(t[i_k1])
     if (i_k1 >= ik):
       i_k1 += 1
     row_lst.append(i_k1)
@@ -53,4 +56,4 @@ def gko(A, x, y, TOL):
     if ar < TOL:
       break
     
-  return k, ap_error
+  return k, ap_error, t_lst
