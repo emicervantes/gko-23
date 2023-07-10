@@ -33,14 +33,10 @@ def mwrko(A, x, y, TOL):
     row_lst.append(i_k1)
     t_lst.append(t[i_k1])
     # Oblique projection with the new selected row
-    ai = A[ik,:] # a_k-1
-    ai_k = A[i_k1,:] # a_k
-    D_ik = ai@ai_k
-    r = y[i_k1] - ai_k@x_old
-    w = ai_k - ((D_ik / np.linalg.norm(ai)**2) * ai)
-    h_ik = np.linalg.norm(w)**2
-    alpha = r / h_ik
-    xk = x_old + alpha*w
+    r = A[i_k1,:]@x_old - y[i_k1]
+    w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
+    t = r / np.linalg.norm(w)**2
+    xk = x_old - t*w
     x_old = xk
     x_lst.append(x_old)
     ar = (np.linalg.norm(x_old-x))**2
