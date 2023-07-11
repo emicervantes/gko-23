@@ -23,15 +23,12 @@ def mwrko(A, x, y, TOL):
   ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   k += 1
-  t_lst = []
 
   while True:
     ik = row_lst[-1]
     resid = abs(A@x_old - y)
     i_k1 = np.argmax(resid/denom)
-    t = resid/denom
     row_lst.append(i_k1)
-    t_lst.append(t[i_k1])
     # Oblique projection with the new selected row
     r = A[i_k1,:]@x_old - y[i_k1]
     w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
@@ -45,4 +42,4 @@ def mwrko(A, x, y, TOL):
 
     if ar < TOL:
       break
-  return k, ap_error, t_lst
+  return k, ap_error
