@@ -5,7 +5,6 @@ def mwrko(A, x, y, TOL):
   m, n = A.shape
   inner_p = A@np.transpose(A)
   x_old = np.zeros(n)
-  x_lst = [x_old]
   ap_error = []
   ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
@@ -35,7 +34,6 @@ def mwrko(A, x, y, TOL):
     t = r / np.linalg.norm(w)**2
     xk = x_old - t*w
     x_old = xk
-    x_lst.append(x_old)
     ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
