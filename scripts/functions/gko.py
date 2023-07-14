@@ -5,7 +5,6 @@ def gko(A, x, y, TOL):
   m, n = A.shape
   inner_p = A@np.transpose(A)
   x_old = np.zeros(n)
-  x_lst = [x_old]
   ap_error = []
   ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
@@ -19,7 +18,6 @@ def gko(A, x, y, TOL):
   x1 = x_old - ((a1@x_old - y[i1]) / np.linalg.norm(a1)**2) * np.transpose(a1)
   x_old = x1
   row_lst.append(i1)
-  x_lst.append(x_old)
   ar = (np.linalg.norm(x_old-x))**2
   ap_error.append(ar)
   k += 1
@@ -41,7 +39,6 @@ def gko(A, x, y, TOL):
     t = r / np.linalg.norm(w)**2
     xk = x_old - t*w
     x_old = xk
-    x_lst.append(x_old)
     ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     k+=1
