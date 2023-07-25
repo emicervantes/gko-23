@@ -58,7 +58,7 @@ def method(A, x, y, case, TOL):
         ap_error.append(ar)
         k+=1
         
-        if ar < TOL:
+        if ar < TOL or k == 100000:
             break
             
     return k, ap_error
