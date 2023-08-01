@@ -1,5 +1,9 @@
 import numpy as np
-def method(A, x, y, case, TOL):
+
+def method2(A, x, y, case, LH1, LH, TOL):
+    
+    # LH is the left hand side of convergence rate: 
+    ## LH1 is for first iterate and LH is for the rest
     
     k=1
     m, n = A.shape
@@ -8,6 +12,9 @@ def method(A, x, y, case, TOL):
     ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     upper_bd = []
+    # add upper_bd
+    bd = LH1 * ( np.linalg.norm(x_old - x)**2 )
+    upper_bd.append(bd)
     
     if case == 'GKO' or case == 'MWRKO':
         inner_p = A@np.transpose(A)
@@ -17,6 +24,10 @@ def method(A, x, y, case, TOL):
         i1 = np.argmax(resid/denom)
         a1 = A[i1,:]
         x1 = x_old - ((a1@x_old - y[i1]) / np.linalg.norm(a1)**2) * np.transpose(a1)
+        # add upper_bd
+        bd = LH1 * ( np.linalg.norm(x_old - x)**2 )
+        upper_bd.append(bd)
+        # update x
         x_old = x1
         row_lst.append(i1)
         ar = (np.linalg.norm(x_old-x))**2
@@ -53,7 +64,11 @@ def method(A, x, y, case, TOL):
                 w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w 
-                
+  
+        # compute upper_bd
+        bd = LH * ( np.linalg.norm(x_old - x)**2 )
+        upper_bd.append(bd)
+        # update x
         x_old = xk
         ar = (np.linalg.norm(x_old-x))**2
         ap_error.append(ar)
@@ -62,4 +77,4 @@ def method(A, x, y, case, TOL):
         if ar < TOL or k == 100000:
             break
             
-    return k, ap_error
+    return k, ap_error, upper_bd
