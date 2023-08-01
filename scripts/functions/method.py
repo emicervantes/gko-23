@@ -5,7 +5,7 @@ def method(A, x, y, case, TOL):
     m, n = A.shape
     x_old = np.zeros(n)
     ap_error = []
-    ar = (np.linalg.norm(x_old-x))**2
+    ar = (np.linalg.norm(y-A@x_old))**2 / np.linalg.norm(y)**2
     ap_error.append(ar)
     
     if case == 'GKO' or case == 'MWRKO':
@@ -18,7 +18,7 @@ def method(A, x, y, case, TOL):
         x1 = x_old - ((a1@x_old - y[i1]) / np.linalg.norm(a1)**2) * np.transpose(a1)
         x_old = x1
         row_lst.append(i1)
-        ar = (np.linalg.norm(x_old-x))**2
+        ar = (np.linalg.norm(y-A@x_old))**2 / np.linalg.norm(y)**2
         ap_error.append(ar)
         k += 1
         ik = row_lst[-1]
@@ -54,7 +54,7 @@ def method(A, x, y, case, TOL):
                 xk = x_old - t*w 
                 
         x_old = xk
-        ar = (np.linalg.norm(x_old-x))**2
+        ar = (np.linalg.norm(y-A@x_old))**2 / np.linalg.norm(y)**2
         ap_error.append(ar)
         k+=1
         
