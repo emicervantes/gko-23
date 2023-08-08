@@ -1,21 +1,22 @@
 import numpy as np
 
-def method2(A, x, y, case, LH1, LH, TOL):
+def method2(A, x, y, case, LH1, LH2, LHk, TOL):
     
     # LH is the left hand side of convergence rate: 
-    ## LH1 is for first iterate and LH is for the rest
+    ## LH1 is for first iterate
+    ## LH2 is for the second iterate (used for GKO and MWRKO only)
+    ## LHk is for the k-th iterate
     
     k=1
     m, n = A.shape
     x_old = np.zeros(n)
     ap_error = []
+    # e0 = ||x0 - x*||^2
     ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
     upper_bd = []
-    # add upper_bd
-    bd = LH1 * ( np.linalg.norm(x_old - x)**2 )
-    upper_bd.append(bd)
     
+    # first iterate (k = 1)
     if case == 'GKO' or case == 'MWRKO':
         inner_p = A@np.transpose(A)
         row_lst = [] 
@@ -24,8 +25,8 @@ def method2(A, x, y, case, LH1, LH, TOL):
         i1 = np.argmax(resid/denom)
         a1 = A[i1,:]
         x1 = x_old - ((a1@x_old - y[i1]) / np.linalg.norm(a1)**2) * np.transpose(a1)
-        # add upper_bd
-        bd = LH1 * ( np.linalg.norm(x_old - x)**2 )
+        # add upper_bd: ||x1 - x*||^2 <= LH1 * ||x0 - x*||^2
+        bd = LH1 * ar
         upper_bd.append(bd)
         # update x
         x_old = x1
@@ -43,6 +44,9 @@ def method2(A, x, y, case, LH1, LH, TOL):
                 i = np.argmax(r)
                 ai = A[i,:]
                 xk = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
+                # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                bd = ( LHk ** k ) * ap_error[0]
+                upper_bd.append(bd)
             case "GKO":
                 inner_dig = np.delete(inner_p.diagonal(), ik)
                 all_comb = np.delete(inner_p[:,ik], ik)
@@ -56,6 +60,13 @@ def method2(A, x, y, case, LH1, LH, TOL):
                 w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w
+                # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                if k == 2:
+                    bd = LH2 * ar
+                    upper_bd.append(bd)
+                else:
+                    bd = LHk * ar
+                    upper_bd.append(bd)
             case "MWRKO":
                 resid = abs(rhat)
                 i_k1 = np.argmax(resid/denom)
@@ -64,17 +75,28 @@ def method2(A, x, y, case, LH1, LH, TOL):
                 w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w 
+                # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                if k == 2:
+                    bd = LH2 * ar
+                    upper_bd.append(bd)
+                else:
+                    bd = LHk * ar
+                    upper_bd.append(bd)
   
-        # compute upper_bd
-        bd = LH * ( np.linalg.norm(x_old - x)**2 )
-        upper_bd.append(bd)
-        # update x
+        # update x and approximation error
         x_old = xk
         ar = (np.linalg.norm(x_old-x))**2
         ap_error.append(ar)
         k+=1
         
         if ar < TOL or k == 100000:
+            if case == 'GK':
+            # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                bd = ( LHk ** k ) * ap_error[0]
+                upper_bd.append(bd)
+            else:
+                bd = LHk * ar
+                upper_bd.append(bd)
             break
             
     return k, ap_error, upper_bd
