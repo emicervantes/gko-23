@@ -61,11 +61,13 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                # compute dynamic range
+                gamma = np.linalg.norm(A@x_old - y, np.inf)**2 / np.linalg.norm(A@x_old - y)**2
                 if k == 2:
-                    bd = LH2 * ar
+                    bd = ( 1 - LH2 / gamma ) * ar
                     upper_bd.append(bd)
                 else:
-                    bd = LHk * ar
+                    bd = ( 1 - LH2 / gamma ) * ar
                     upper_bd.append(bd)
             case "MWRKO":
                 resid = abs(rhat)
@@ -86,6 +88,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
         # update x and approximation error
         x_old = xk
         ar = (np.linalg.norm(x_old-x))**2
+        gamma = np.linalg.norm(A@x_old - y, np.inf)**2 / np.linalg.norm(A@x_old - y)**2
         ap_error.append(ar)
         k+=1
         
@@ -94,8 +97,8 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
             # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
                 bd = ( LHk ** k ) * ap_error[0]
                 upper_bd.append(bd)
-            else:
-                bd = LHk * ar
+            if case == 'GKO':
+                bd = ( 1 - LHk / gamma ) * ar
                 upper_bd.append(bd)
             break
             
