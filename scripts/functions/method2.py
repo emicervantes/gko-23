@@ -13,7 +13,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
     ap_error = []
     # e0 = ||x0 - x*||^2
     ar = (np.linalg.norm(x_old-x))**2
-    ap_error.append(ar)
+    #ap_error.append(ar)
     upper_bd = []
     
     # first iterate (k = 1)
