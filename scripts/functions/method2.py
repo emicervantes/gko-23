@@ -32,10 +32,10 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
         x_old = x1
         row_lst.append(i1)
         ar = (np.linalg.norm(x_old-x))**2
-        ap_error.append(ar)
+        #ap_error.append(ar)
         k += 1
         ik = row_lst[-1]
-    
+    count = 0
     while True:
         rhat = A@x_old - y
         match case:
@@ -45,7 +45,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 ai = A[i,:]
                 xk = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
-                bd = ( LHk ** k ) * ap_error[0]
+                bd = ( LHk ** k ) * (np.linalg.norm(x_old-x))**2
                 upper_bd.append(bd)
             case "GKO":
                 inner_dig = np.delete(inner_p.diagonal(), ik)
@@ -58,6 +58,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 row_lst.append(i_k1)
                 r = A[i_k1,:]@x_old - y[i_k1]
                 w = A[i_k1,:] - ((inner_p[ik, i_k1] / np.linalg.norm( A[ik,:])**2) * A[ik,:])
+                print(max(w)**2)
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
@@ -69,6 +70,10 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 else:
                     bd = ( 1 - LH2 / gamma ) * ar
                     upper_bd.append(bd)
+                print(LH2 / gamma)
+                print(gamma)
+                print("")
+                count += 1
             case "MWRKO":
                 resid = abs(rhat)
                 i_k1 = np.argmax(resid/denom)
@@ -91,6 +96,9 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
         gamma = np.linalg.norm(A@x_old - y, np.inf)**2 / np.linalg.norm(A@x_old - y)**2
         ap_error.append(ar)
         k+=1
+        
+        if count == 5:
+            break
         
         if ar < TOL or k == 100000:
             if case == 'GK':
