@@ -44,7 +44,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 ai = A[i,:]
                 xk = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
-                bd = ( LHk ** k ) * (np.linalg.norm(x_old-x))**2
+                bd = ( LHk ** k ) * (np.linalg.norm(np.zeros(n) - x)**2)
                 upper_bd.append(bd)
             case "GKO":
                 inner_dig = np.delete(inner_p.diagonal(), ik)
@@ -87,7 +87,7 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
         # update x and approximation error
         x_old = xk
         ar = (np.linalg.norm(x_old-x))**2
-        gamma = np.linalg.norm(A@x_old - y, np.inf)**2 / np.linalg.norm(A@x_old - y)**2
+        gamma = np.linalg.norm(A@x_old - y)**2 / np.linalg.norm(A@x_old - y, np.inf)**2
         ap_error.append(ar)
         k+=1
         
