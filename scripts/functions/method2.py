@@ -15,6 +15,11 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
     ar = (np.linalg.norm(x_old-x))**2
     #ap_error.append(ar)
     upper_bd = []
+    gk_LHS_lst = []
+    gko_LHS_lst = [LH1]
+    mwrko_LHS_lst = [LH1]
+
+    
     # first iterate (k = 1)
     if case == 'GKO' or case == 'MWRKO':
         inner_p = A@np.transpose(A)
@@ -44,7 +49,9 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 ai = A[i,:]
                 xk = x_old - ((np.transpose(ai)@x_old - y[i]) /  np.linalg.norm(ai)**2 * ai)
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
-                bd = ( LHk ** k ) * (np.linalg.norm(np.zeros(n) - x)**2)
+                gamma = np.linalg.norm(A@xk - y)**2 / np.linalg.norm(A@xk - y, np.inf)**2
+                gk_LHS_lst.append(1 - (LHk / gamma))
+                bd = np.prod(gk_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                 upper_bd.append(bd)
             case "GKO":
                 inner_dig = np.delete(inner_p.diagonal(), ik)
@@ -62,11 +69,13 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
                 # compute dynamic range
                 gamma = np.linalg.norm(A@x_old - y)**2 / np.linalg.norm(A@x_old - y, np.inf)**2
-                if k < 2:
-                    bd = ( 1 - LH2 / gamma ) * ar
+                if k == 2:
+                    gko_LHS_lst.append(1 - LH2 / gamma)
+                    bd = np.prod(gko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
                 else:
-                    bd = ( 1 - LH2 / gamma ) * ar
+                    gko_LHS_lst.append(1 - LHk / gamma)
+                    bd = np.prod(gko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
             case "MWRKO":
                 resid = abs(rhat)
@@ -78,10 +87,12 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 xk = x_old - t*w 
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
                 if k == 2:
-                    bd = LH2 * ar
+                    mwrko_LHS_lst.append(LH2)
+                    bd = np.prod(mwrko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
                 else:
-                    bd = LHk * ar
+                    mwrko_LHS_lst.append(LHk)
+                    bd = np.prod(mwrko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
   
         # update x and approximation error
@@ -91,14 +102,19 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
         ap_error.append(ar)
         k+=1
         
+        
         if ar < TOL or k == 100000:
-            if case == 'GK':
+            #print(len(gk_LHS_lst))
+            #print(len(gko_LHS_lst))
+            #print(len(mwrko_LHS_lst))
+            #if case == 'GK':
             # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
-                bd = ( LHk ** k ) * ap_error[0]
-                upper_bd.append(bd)
-            if case == 'GKO':
-                bd = ( 1 - LHk / gamma ) * ar
-                upper_bd.append(bd)
+            #    gk_LHS_lst.append(1 - (LHk / gamma))
+            #    bd = np.prod(gk_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
+            #    upper_bd.append(bd)
+            #if case == 'GKO':
+            #    bd = ( 1 - LHk / gamma ) * ar
+            #    upper_bd.append(bd)
             break
             
     return k, ap_error, upper_bd
