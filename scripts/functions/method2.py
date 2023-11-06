@@ -10,11 +10,11 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
     k=1
     m, n = A.shape
     x_old = np.zeros(n)
-    ap_error = []
     # e0 = ||x0 - x*||^2
     ar = (np.linalg.norm(x_old-x))**2
+    ap_error = [ar]
     #ap_error.append(ar)
-    upper_bd = []
+    upper_bd = [ar]
     gk_LHS_lst = []
     gko_LHS_lst = [LH1]
     mwrko_LHS_lst = [LH1]
