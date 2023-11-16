@@ -67,14 +67,20 @@ def method2(A, x, y, case, LH1, LH2, LHk, TOL):
                 t = r / np.linalg.norm(w)**2
                 xk = x_old - t*w
                 # compute upper_bd: ||xk - x*||^2 <= LH * ||x(k-1) - x*||^2
+                D = np.linalg.inv(np.diag(w))
+                U,S,V = np.linalg.svd(D)
+                DS2_min = min(S**2)
+                AD = A @ D
                 # compute dynamic range
-                gamma = np.linalg.norm(A@x_old - y)**2 / np.linalg.norm(A@x_old - y, np.inf)**2
+                gamma = np.linalg.norm(AD@x_old - AD@x)**2 / np.linalg.norm(AD@x_old - AD@x, np.inf)**2
+  
+                #old_gamma = np.linalg.norm(A@x_old - y)**2 / np.linalg.norm(A@x_old - y, np.inf)**2
                 if k == 2:
-                    gko_LHS_lst.append(1 - LH2 / gamma)
+                    gko_LHS_lst.append(1 - (LH2 * DS2_min / gamma))
                     bd = np.prod(gko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
                 else:
-                    gko_LHS_lst.append(1 - LHk / gamma)
+                    gko_LHS_lst.append(1 - (LHk * DS2_min / gamma))
                     bd = np.prod(gko_LHS_lst) * (np.linalg.norm(np.zeros(n) - x)**2)
                     upper_bd.append(bd)
             case "MWRKO":
