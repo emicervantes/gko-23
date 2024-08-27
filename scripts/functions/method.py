@@ -4,6 +4,7 @@ def method(A, x, y, case, TOL):
     k=1
     m, n = A.shape
     x_old = np.zeros(n)
+    x_lst = [x_old]
     ap_error = []
     ar = (np.linalg.norm(x_old-x))**2
     ap_error.append(ar)
@@ -54,6 +55,7 @@ def method(A, x, y, case, TOL):
                 xk = x_old - t*w 
                 
         x_old = xk
+        x_lst.append(x_old)
         ar = (np.linalg.norm(x_old-x))**2
         ap_error.append(ar)
         k+=1
@@ -61,4 +63,4 @@ def method(A, x, y, case, TOL):
         if ar < TOL or k == 100000:
             break
             
-    return k, ap_error
+    return k, ap_error, x_lst
