@@ -1,6 +1,8 @@
 # Greedy Kaczmarz Method with Oblique Projection 
 
-Authors: Emi Cervantes, Jenny Tran
+**Authors:** Emi Cervantes, Jenny Tran
+
+Randomized iterative algorithms are commonly used to solve large-scale linear systems of the form $Ax = b$. The Kaczmarz method is one such algorithm that utilizes only one row of $A$ in each iteration to perform orthogonal projections to solve linear systems. There are many ways to choose the next row. One such approach is a greedy method, also known as Motzkin’s Method. A variation of the Kaczmarz algorithm called Kaczmarz with oblique projections (KO), was proposed recently and utilizes oblique projections to improve convergence speed. To optimize computation, we propose the Greedy Kaczmarz with oblique projections (GKO) which chooses the row associated with the largest step length when allowing for oblique projections. Our theoretical results and numerical experiments show that in some settings, GKO performs better than alternative greedy oblique projection methods
 
 ## Experiment Descriptions
 
